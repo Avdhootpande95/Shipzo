@@ -82,9 +82,9 @@ export function RouteComparison() {
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'Low': return 'bg-green-500';
-      case 'Medium': return 'bg-yellow-500';
-      case 'High': return 'bg-destructive';
+      case 'Low': return 'bg-green-500'; // Green for success/low risk
+      case 'Medium': return 'bg-yellow-500'; // Yellow for warning/medium risk
+      case 'High': return 'bg-red-500'; // Red for critical/high risk
       default: return 'bg-gray-500';
     }
   };

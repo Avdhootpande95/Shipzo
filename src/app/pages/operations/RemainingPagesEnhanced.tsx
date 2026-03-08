@@ -4,9 +4,87 @@ import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
 import { 
   MapPin, Plane, Ship, Truck, DollarSign, TrendingDown, Lightbulb,
-  FileText, CheckCircle, Clock, Download, Share, Eye, User, Send, Bell, MessageSquare
+  FileText, CheckCircle, Clock, Download, Share, Eye, User, Send, Bell, MessageSquare,
+  Navigation, AlertTriangle, Thermometer
 } from 'lucide-react';
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import worldMapBg from 'figma:asset/c7230fcf991b0848d1de94be47c71521c1e3d5e2.png';
+
+// Live Shipments Data for Route Planning Map
+const liveShipments = [
+  {
+    id: 'SH-2024-001',
+    route: 'Singapore → Frankfurt',
+    mode: 'Air',
+    status: 'In Transit',
+    currentLocation: 'Over Arabian Sea',
+    progress: 65,
+    coordinates: { left: '60%', top: '35%' }
+  },
+  {
+    id: 'SH-2024-002',
+    route: 'Boston → Tokyo',
+    mode: 'Sea',
+    status: 'In Transit',
+    currentLocation: 'Pacific Ocean',
+    progress: 42,
+    coordinates: { left: '25%', top: '45%' }
+  },
+  {
+    id: 'SH-2024-003',
+    route: 'Mumbai → London',
+    mode: 'Air',
+    status: 'In Transit',
+    currentLocation: 'Middle East Airspace',
+    progress: 80,
+    coordinates: { left: '55%', top: '40%' }
+  },
+  {
+    id: 'SH-2024-004',
+    route: 'Shanghai → Dubai',
+    mode: 'Rail',
+    status: 'Alert',
+    currentLocation: 'Central Asia Hub',
+    progress: 28,
+    coordinates: { left: '65%', top: '42%' }
+  },
+  {
+    id: 'SH-2024-005',
+    route: 'New York → Amsterdam',
+    mode: 'Air',
+    status: 'In Transit',
+    currentLocation: 'Atlantic Ocean',
+    progress: 55,
+    coordinates: { left: '38%', top: '35%' }
+  },
+  {
+    id: 'SH-2024-006',
+    route: 'Sydney → Los Angeles',
+    mode: 'Air',
+    status: 'In Transit',
+    currentLocation: 'Pacific Crossing',
+    progress: 70,
+    coordinates: { left: '15%', top: '65%' }
+  },
+  {
+    id: 'SH-2024-007',
+    route: 'Cape Town → Paris',
+    mode: 'Air',
+    status: 'In Transit',
+    currentLocation: 'Over Mediterranean',
+    progress: 85,
+    coordinates: { left: '48%', top: '55%' }
+  },
+  {
+    id: 'SH-2024-008',
+    route: 'Tokyo → Frankfurt',
+    mode: 'Air',
+    status: 'In Transit',
+    currentLocation: 'Over Russia',
+    progress: 50,
+    coordinates: { left: '75%', top: '30%' }
+  },
+];
 
 // Route Planning Data
 const routes = [
@@ -201,16 +279,121 @@ export function RoutePlanningEnhanced() {
       {/* Interactive Map */}
       <Card className="rounded-2xl border-2">
         <CardHeader>
-          <CardTitle>Route Visualization</CardTitle>
-          <CardDescription>Interactive map showing origin, transit hubs, and destination</CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Live Shipment Tracking Map</CardTitle>
+              <CardDescription>Real-time global shipment locations and routes</CardDescription>
+            </div>
+            <Badge variant="outline" className="rounded-lg">
+              <Navigation className="h-3 w-3 mr-1" />
+              {liveShipments.length} Active Shipments
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="bg-gradient-to-br from-blue-100 via-blue-50 to-orange-50 rounded-xl h-[400px] relative border-2 border-dashed border-gray-300">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center space-y-3">
-                <MapPin className="h-12 w-12 text-secondary mx-auto" />
-                <p className="text-muted-foreground font-medium">Interactive Route Map</p>
-                <p className="text-sm text-muted-foreground">Visualizing optimal shipping routes</p>
+          <div className="bg-white rounded-xl h-[500px] relative overflow-hidden border-2">
+            {/* World Map Background */}
+            <div className="absolute inset-0">
+              <img 
+                src={worldMapBg} 
+                alt="World Map" 
+                className="w-full h-full object-cover opacity-40"
+              />
+            </div>
+
+            {/* Live Shipment Markers */}
+            {liveShipments.map((shipment) => {
+              const getModeIcon = () => {
+                switch (shipment.mode) {
+                  case 'Air': return <Plane className="h-4 w-4 text-white" />;
+                  case 'Sea': return <Ship className="h-4 w-4 text-white" />;
+                  case 'Rail': return <Truck className="h-4 w-4 text-white rotate-180" />;
+                  default: return <Truck className="h-4 w-4 text-white" />;
+                }
+              };
+
+              const getStatusColor = () => {
+                return shipment.status === 'Alert' ? 'bg-destructive' : 'bg-secondary';
+              };
+
+              return (
+                <div
+                  key={shipment.id}
+                  className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform z-10"
+                  style={{
+                    left: shipment.coordinates.left,
+                    top: shipment.coordinates.top
+                  }}
+                >
+                  <div className="relative group">
+                    <div className={`${getStatusColor()} rounded-full p-3 shadow-lg animate-pulse`}>
+                      {getModeIcon()}
+                    </div>
+                    
+                    {/* Tooltip on hover */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20 whitespace-nowrap">
+                      <div className="bg-white rounded-lg shadow-xl border-2 p-3">
+                        <p className="font-semibold text-sm text-gray-900">{shipment.id}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{shipment.route}</p>
+                        <p className="text-xs text-muted-foreground">{shipment.currentLocation}</p>
+                        <div className="flex items-center gap-1 mt-2">
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div 
+                              className="bg-secondary rounded-full h-1.5"
+                              style={{ width: `${shipment.progress}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs font-medium text-gray-700">{shipment.progress}%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Ping animation for alerts */}
+                    {shipment.status === 'Alert' && (
+                      <div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-75"></div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Map Legend */}
+            <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg border-2 z-20">
+              <p className="font-semibold text-sm mb-3">Transport Modes</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="bg-secondary rounded-full p-1.5">
+                    <Plane className="h-3 w-3 text-white" />
+                  </div>
+                  <span>Air Freight</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="bg-secondary rounded-full p-1.5">
+                    <Ship className="h-3 w-3 text-white" />
+                  </div>
+                  <span>Sea Freight</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="bg-secondary rounded-full p-1.5">
+                    <Truck className="h-3 w-3 text-white rotate-180" />
+                  </div>
+                  <span>Rail Transport</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Legend */}
+            <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg border-2 z-20">
+              <p className="font-semibold text-sm mb-3">Status Indicators</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="h-3 w-3 rounded-full bg-secondary animate-pulse"></div>
+                  <span>In Transit</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="h-3 w-3 rounded-full bg-destructive animate-pulse"></div>
+                  <span>Alert</span>
+                </div>
               </div>
             </div>
           </div>

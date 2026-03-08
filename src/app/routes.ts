@@ -10,12 +10,14 @@ import { TemperatureChange } from "./pages/TemperatureChange";
 import { OperationsMap } from "./pages/OperationsMap";
 import { CostBreakdown } from "./pages/CostBreakdown";
 import { ContactCarrier } from "./pages/ContactCarrier";
+import { LastMileDelivery } from "./pages/LastMileDelivery";
 import { OperationsDashboard } from "./pages/operations/OperationsDashboard";
 import { ActiveShipmentsEnhanced } from "./pages/operations/ActiveShipmentsEnhanced";
 import { InventoryEnhanced } from "./pages/operations/InventoryEnhanced";
 import { CarrierManagementEnhanced } from "./pages/operations/CarrierManagementEnhanced";
 import { AlertsEnhanced } from "./pages/operations/AlertsEnhanced";
 import { RoutePlanningEnhanced, CostMonitoringEnhanced, ComplianceEnhanced, CommunicationsEnhanced } from "./pages/operations/RemainingPagesEnhanced";
+import { LastMileOperations } from "./pages/operations/LastMileOperations";
 import { NotFound } from "./pages/NotFound";
 
 export const router = createBrowserRouter([
@@ -35,6 +37,7 @@ export const router = createBrowserRouter([
       { path: "operations-map", Component: OperationsMap },
       { path: "cost-breakdown", Component: CostBreakdown },
       { path: "contact-carrier", Component: ContactCarrier },
+      { path: "last-mile-delivery", Component: LastMileDelivery },
     ],
   },
   {
@@ -50,6 +53,7 @@ export const router = createBrowserRouter([
       { path: "cost-monitoring", Component: CostMonitoringEnhanced },
       { path: "compliance", Component: ComplianceEnhanced },
       { path: "communications", Component: CommunicationsEnhanced },
+      { path: "last-mile-delivery", Component: LastMileOperations },
     ],
   },
   {

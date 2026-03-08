@@ -14,6 +14,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
+import worldMapBg from 'figma:asset/c7230fcf991b0848d1de94be47c71521c1e3d5e2.png';
 
 const shipmentModeData = [
   { name: 'Air', value: 45, color: '#3b82f6' },
@@ -238,20 +239,30 @@ export function OperationsDashboard() {
             <CardDescription>Real-time shipment tracking worldwide</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="bg-gradient-to-br from-blue-100 via-blue-50 to-orange-50 rounded-xl h-[400px] relative border-2 border-dashed border-gray-300">
-              <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-white rounded-xl h-[400px] relative overflow-hidden border-2">
+              {/* World Map Background */}
+              <div className="absolute inset-0">
+                <img 
+                  src={worldMapBg} 
+                  alt="World Map" 
+                  className="w-full h-full object-cover opacity-40"
+                />
+              </div>
+
+              {/* Shipment Indicators Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <div className="text-center space-y-3">
-                  <MapPin className="h-12 w-12 text-secondary mx-auto" />
-                  <p className="text-muted-foreground font-medium">Interactive World Map</p>
-                  <p className="text-sm text-muted-foreground">123 active shipments tracked globally</p>
+                  <MapPin className="h-12 w-12 text-secondary mx-auto drop-shadow-lg" />
+                  <p className="text-gray-900 font-semibold">123 Active Shipments</p>
+                  <p className="text-sm text-muted-foreground">Tracking globally in real-time</p>
                   <div className="flex gap-2 justify-center pt-2">
-                    <Badge variant="outline" className="rounded-lg">
+                    <Badge variant="outline" className="rounded-lg bg-white/90 backdrop-blur-sm border-2">
                       <Plane className="h-3 w-3 mr-1" /> 45 Air
                     </Badge>
-                    <Badge variant="outline" className="rounded-lg">
+                    <Badge variant="outline" className="rounded-lg bg-white/90 backdrop-blur-sm border-2">
                       <Ship className="h-3 w-3 mr-1" /> 28 Sea
                     </Badge>
-                    <Badge variant="outline" className="rounded-lg">
+                    <Badge variant="outline" className="rounded-lg bg-white/90 backdrop-blur-sm border-2">
                       <Truck className="h-3 w-3 mr-1" /> 50 Land
                     </Badge>
                   </div>

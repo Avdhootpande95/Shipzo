@@ -16,7 +16,8 @@ import {
   User,
   LogOut,
   Menu,
-  X
+  X,
+  Navigation
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -35,6 +36,7 @@ export function OperationsLayout() {
     { path: '/operations/cost-monitoring', label: 'Cost Monitoring', icon: DollarSign },
     { path: '/operations/compliance', label: 'Compliance & Documents', icon: FileText },
     { path: '/operations/communications', label: 'Communications', icon: MessageSquare },
+    { path: '/operations/last-mile-delivery', label: 'Last-Mile Delivery', icon: Navigation },
   ];
 
   const handleLogout = () => {

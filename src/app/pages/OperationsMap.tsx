@@ -14,6 +14,7 @@ import {
   Package,
   AlertCircle
 } from 'lucide-react';
+import worldMapBg from 'figma:asset/c7230fcf991b0848d1de94be47c71521c1e3d5e2.png';
 
 const shipments = [
   {
@@ -81,9 +82,9 @@ export function OperationsMap() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'In Transit': return 'bg-secondary';
-      case 'Alert': return 'bg-destructive';
-      case 'Delivered': return 'bg-green-500';
+      case 'In Transit': return 'bg-blue-500'; // Blue for active shipments
+      case 'Alert': return 'bg-red-500'; // Red for critical alerts
+      case 'Delivered': return 'bg-green-500'; // Green for success
       default: return 'bg-gray-500';
     }
   };
@@ -120,22 +121,21 @@ export function OperationsMap() {
       {/* Map Visualization */}
       <Card className="rounded-2xl border-2">
         <CardContent className="p-6">
-          <div className="bg-gradient-to-br from-blue-100 via-blue-50 to-orange-50 rounded-xl h-[500px] relative border-2 border-dashed border-gray-300 overflow-hidden">
-            {/* Map Background */}
-            <div className="absolute inset-0 opacity-20">
-              <svg className="w-full h-full" viewBox="0 0 1000 500">
-                {/* Simplified world map paths */}
-                <path d="M 100 200 Q 200 180 300 200 T 500 200" stroke="#3b82f6" fill="none" strokeWidth="2" strokeDasharray="5,5" />
-                <path d="M 200 250 Q 400 230 600 240" stroke="#f97316" fill="none" strokeWidth="2" strokeDasharray="5,5" />
-                <path d="M 300 180 Q 500 160 700 180" stroke="#10b981" fill="none" strokeWidth="2" strokeDasharray="5,5" />
-              </svg>
+          <div className="bg-white rounded-xl h-[500px] relative overflow-hidden border-2">
+            {/* World Map Background */}
+            <div className="absolute inset-0">
+              <img 
+                src={worldMapBg} 
+                alt="World Map" 
+                className="w-full h-full object-cover opacity-40"
+              />
             </div>
 
             {/* Shipment Markers */}
             {shipments.map((shipment, idx) => (
               <div
                 key={shipment.id}
-                className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
+                className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform z-10"
                 style={{
                   left: `${20 + idx * 20}%`,
                   top: `${30 + (idx % 3) * 20}%`
@@ -165,7 +165,7 @@ export function OperationsMap() {
             ))}
 
             {/* Legend */}
-            <div className="absolute bottom-4 left-4 bg-white rounded-xl p-4 shadow-lg border-2">
+            <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg border-2 z-20">
               <p className="font-semibold text-sm mb-2">Transport Modes</p>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
@@ -190,7 +190,7 @@ export function OperationsMap() {
             </div>
 
             {/* Status Legend */}
-            <div className="absolute bottom-4 right-4 bg-white rounded-xl p-4 shadow-lg border-2">
+            <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg border-2 z-20">
               <p className="font-semibold text-sm mb-2">Status</p>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">

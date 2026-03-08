@@ -15,7 +15,8 @@ import {
   User,
   LogOut,
   Menu,
-  X
+  X,
+  Navigation
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -33,6 +34,7 @@ export function DashboardLayout() {
     { path: '/dashboard/operations-map', label: 'Operations Map', icon: MapPin },
     { path: '/dashboard/cost-breakdown', label: 'Cost Breakdown', icon: DollarSign },
     { path: '/dashboard/contact-carrier', label: 'Contact Carrier', icon: Phone },
+    { path: '/dashboard/last-mile-delivery', label: 'Last-Mile Delivery', icon: Navigation },
   ];
 
   const handleLogout = () => {

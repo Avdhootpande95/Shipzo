@@ -1,22 +1,23 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
 import { useNavigate } from 'react-router';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 import { 
-  Package, 
-  Clock, 
+  Thermometer, 
+  TrendingUp, 
   AlertTriangle, 
-  ShoppingCart, 
-  CheckCircle, 
-  PlusCircle, 
-  Search, 
-  TrendingUp,
-  Ship,
+  Clock, 
+  Package, 
+  CheckCircle2,
+  Search,
   Plane,
   Truck,
-  MapPin
+  MapPin,
+  PlusCircle,
+  ShoppingCart
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import worldMapBg from 'figma:asset/c7230fcf991b0848d1de94be47c71521c1e3d5e2.png';
 
 const statsData = [
   { name: 'Mon', shipments: 24 },
@@ -29,10 +30,42 @@ const statsData = [
 ];
 
 const recentShipments = [
-  { id: 'SH-2024-001', route: 'Singapore → Frankfurt', mode: 'Air', status: 'In Transit', temp: '2-8°C', eta: '18 hrs' },
-  { id: 'SH-2024-002', route: 'Boston → Tokyo', mode: 'Sea', status: 'In Transit', temp: '-20°C', eta: '5 days' },
-  { id: 'SH-2024-003', route: 'Mumbai → London', mode: 'Air', status: 'Delivered', temp: '2-8°C', eta: 'Arrived' },
-  { id: 'SH-2024-004', route: 'Shanghai → Dubai', mode: 'Rail', status: 'Alert', temp: '-70°C', eta: '3 days' },
+  { 
+    id: 'SH-2024-001', 
+    route: 'Singapore → Frankfurt', 
+    mode: 'Air', 
+    status: 'In Transit', 
+    temp: '2-8°C', 
+    eta: '18 hrs',
+    summary: 'Shipment initiated in Singapore warehouse, transported via air freight carrier to Dubai hub for customs clearance, currently flying toward Frankfurt international airport with expected ground transfer to final destination via refrigerated truck.'
+  },
+  { 
+    id: 'SH-2024-002', 
+    route: 'Boston → Tokyo', 
+    mode: 'Sea', 
+    status: 'In Transit', 
+    temp: '-20°C', 
+    eta: '5 days',
+    summary: 'Biologic material dispatched from Boston cold storage facility, loaded onto temperature-controlled container ship, currently crossing Pacific Ocean with consistent -20°C monitoring and scheduled to arrive at Tokyo port for final ground delivery.'
+  },
+  { 
+    id: 'SH-2024-003', 
+    route: 'Mumbai → London', 
+    mode: 'Air', 
+    status: 'Delivered', 
+    temp: '2-8°C', 
+    eta: 'Arrived',
+    summary: 'Vaccine batch moved from Mumbai manufacturing cold storage to airport facility, flown directly to London Heathrow, cleared customs successfully, transferred to refrigerated truck and delivered to hospital distribution center maintaining 2-8°C throughout entire journey.'
+  },
+  { 
+    id: 'SH-2024-004', 
+    route: 'Shanghai → Dubai', 
+    mode: 'Rail', 
+    status: 'Alert', 
+    temp: '-70°C', 
+    eta: '3 days',
+    summary: 'Temperature-sensitive pharmaceutical dispatched from Shanghai production facility, transported by specialized rail system across Central Asia hub with brief delay at customs checkpoint, currently experiencing minor temperature fluctuation requiring immediate monitoring and corrective action.'
+  },
 ];
 
 export function ClientDashboard() {
@@ -41,7 +74,7 @@ export function ClientDashboard() {
   const getModeIcon = (mode: string) => {
     switch (mode) {
       case 'Air': return <Plane className="h-4 w-4" />;
-      case 'Sea': return <Ship className="h-4 w-4" />;
+      case 'Sea': return <Truck className="h-4 w-4" />;
       case 'Rail': return <Truck className="h-4 w-4" />;
       default: return <Truck className="h-4 w-4" />;
     }
@@ -49,10 +82,10 @@ export function ClientDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'In Transit': return 'bg-secondary';
-      case 'Delivered': return 'bg-green-500';
-      case 'Alert': return 'bg-destructive';
-      default: return 'bg-gray-500';
+      case 'In Transit': return 'bg-blue-500 text-white'; // Blue for active shipments
+      case 'Delivered': return 'bg-green-500 text-white'; // Green for success
+      case 'Alert': return 'bg-red-500 text-white'; // Red for critical alerts
+      default: return 'bg-gray-500 text-white';
     }
   };
 
@@ -66,7 +99,7 @@ export function ClientDashboard() {
         </div>
         <div className="flex gap-2">
           <Button 
-            className="rounded-xl bg-primary hover:bg-primary/90"
+            className="rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white"
             onClick={() => navigate('/dashboard/create-order')}
           >
             <PlusCircle className="h-4 w-4 mr-2" />
@@ -77,11 +110,11 @@ export function ClientDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow">
+        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow bg-blue-50/30">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardDescription>Active Shipments</CardDescription>
-              <Package className="h-5 w-5 text-primary" />
+              <Package className="h-5 w-5 text-blue-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -92,11 +125,11 @@ export function ClientDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow">
+        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow bg-yellow-50/30">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardDescription>Pending Deliveries</CardDescription>
-              <Clock className="h-5 w-5 text-secondary" />
+              <Clock className="h-5 w-5 text-yellow-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -105,24 +138,24 @@ export function ClientDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow">
+        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow bg-red-50/30">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardDescription>Temperature Alerts</CardDescription>
-              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-gray-900">3</div>
-            <p className="text-sm text-destructive mt-1">Requires attention</p>
+            <p className="text-sm text-red-600 mt-1">Requires attention</p>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow">
+        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow bg-orange-50/30">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardDescription>Procurement Requests</CardDescription>
-              <ShoppingCart className="h-5 w-5 text-orange-500" />
+              <ShoppingCart className="h-5 w-5 text-orange-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -131,11 +164,11 @@ export function ClientDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow">
+        <Card className="rounded-2xl border-2 hover:shadow-lg transition-shadow bg-green-50/30">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardDescription>Completed Orders</CardDescription>
-              <CheckCircle className="h-5 w-5 text-green-500" />
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -213,59 +246,79 @@ export function ClientDashboard() {
       {/* Recent Shipments */}
       <Card className="rounded-2xl border-2">
         <CardHeader>
-          <CardTitle>Recent Shipments</CardTitle>
-          <CardDescription>Live tracking of your active deliveries</CardDescription>
+          <CardTitle>Active Shipments with Journey Summary</CardTitle>
+          <CardDescription>Live tracking with detailed shipment lifecycle</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">Shipment ID</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">Route</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">Mode</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">Temperature</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">Status</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">ETA</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentShipments.map((shipment) => (
-                  <tr key={shipment.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium">{shipment.id}</td>
-                    <td className="py-3 px-4">{shipment.route}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        {getModeIcon(shipment.mode)}
-                        <span>{shipment.mode}</span>
+          <div className="space-y-4">
+            {recentShipments.map((shipment) => (
+              <Card key={shipment.id} className="rounded-xl border-2 hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    {/* Shipment Info */}
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-lg flex items-center gap-2">
+                            {shipment.id}
+                            <Badge className={`${getStatusColor(shipment.status)} rounded-lg`}>
+                              {shipment.status}
+                            </Badge>
+                          </h3>
+                          <p className="text-sm text-muted-foreground mt-1">{shipment.route}</p>
+                        </div>
                       </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge variant="outline" className="rounded-lg">
-                        {shipment.temp}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge className={`${getStatusColor(shipment.status)} text-white rounded-lg`}>
-                        {shipment.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">{shipment.eta}</td>
-                    <td className="py-3 px-4">
+
+                      {/* Journey Summary */}
+                      <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                        <h4 className="text-xs font-semibold text-blue-900 mb-2 flex items-center gap-1">
+                          <Package className="h-3 w-3" />
+                          Journey Summary
+                        </h4>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          {shipment.summary}
+                        </p>
+                      </div>
+
+                      {/* Shipment Details */}
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="flex items-center gap-2">
+                          {getModeIcon(shipment.mode)}
+                          <span className="text-sm">{shipment.mode}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Thermometer className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{shipment.temp}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">ETA: {shipment.eta}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex md:flex-col gap-2">
                       <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="rounded-lg"
+                        size="sm"
+                        className="rounded-lg bg-blue-600 hover:bg-blue-700"
                         onClick={() => navigate('/dashboard/operations-map')}
                       >
-                        View
+                        Track Live
                       </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <Button 
+                        size="sm"
+                        variant="outline"
+                        className="rounded-lg"
+                        onClick={() => navigate('/dashboard/temperature-change')}
+                      >
+                        View Details
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -277,16 +330,29 @@ export function ClientDashboard() {
           <CardDescription>Real-time location tracking</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="bg-gradient-to-br from-blue-50 to-orange-50 rounded-xl h-64 flex items-center justify-center border-2 border-dashed border-gray-300">
-            <div className="text-center space-y-3">
-              <MapPin className="h-12 w-12 text-primary mx-auto" />
-              <p className="text-muted-foreground">Interactive map showing 24 active shipments worldwide</p>
-              <Button 
-                className="rounded-xl bg-secondary hover:bg-secondary/90"
-                onClick={() => navigate('/dashboard/operations-map')}
-              >
-                Open Full Map View
-              </Button>
+          <div className="bg-white rounded-xl h-64 relative overflow-hidden border-2">
+            {/* World Map Background */}
+            <div className="absolute inset-0">
+              <img 
+                src={worldMapBg} 
+                alt="World Map" 
+                className="w-full h-full object-cover opacity-40"
+              />
+            </div>
+
+            {/* Overlay Content */}
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <div className="text-center space-y-3">
+                <MapPin className="h-12 w-12 text-primary mx-auto drop-shadow-lg" />
+                <p className="text-gray-900 font-semibold">24 Active Shipments Worldwide</p>
+                <p className="text-sm text-muted-foreground">Real-time tracking across all regions</p>
+                <Button 
+                  className="rounded-xl bg-secondary hover:bg-secondary/90 shadow-lg"
+                  onClick={() => navigate('/dashboard/operations-map')}
+                >
+                  Open Full Map View
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
