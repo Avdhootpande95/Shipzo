@@ -21,11 +21,51 @@ import {
 } from 'lucide-react';
 
 const materials = [
-  { id: 1, name: 'mRNA Lipid Nanoparticle', cert: 'GMP', available: 250, expiry: '2027', temp: '−70°C' },
-  { id: 2, name: 'Vaccine Adjuvant MF59', cert: 'GMP', available: 180, expiry: '2026', temp: '2–8°C' },
-  { id: 3, name: 'Monoclonal Antibody Solution', cert: 'GDP', available: 95, expiry: '2027', temp: '2–8°C' },
-  { id: 4, name: 'Lyophilized Protein Powder', cert: 'GMP', available: 320, expiry: '2028', temp: '−20°C' },
-  { id: 5, name: 'Injectable Suspension', cert: 'GDP', available: 140, expiry: '2026', temp: '2–8°C' },
+  { 
+    id: 1, 
+    name: 'mRNA Lipid Nanoparticle', 
+    cert: 'GMP', 
+    available: 250, 
+    expiry: '2027', 
+    temp: '−70°C',
+    usedIn: ['mRNA Vaccines', 'COVID-19 Vaccine', 'Gene Therapy Treatments']
+  },
+  { 
+    id: 2, 
+    name: 'Vaccine Adjuvant MF59', 
+    cert: 'GMP', 
+    available: 180, 
+    expiry: '2026', 
+    temp: '2–8°C',
+    usedIn: ['Influenza Vaccines', 'Pandemic Vaccines', 'Immunization Programs']
+  },
+  { 
+    id: 3, 
+    name: 'Monoclonal Antibody Solution', 
+    cert: 'GDP', 
+    available: 95, 
+    expiry: '2027', 
+    temp: '2–8°C',
+    usedIn: ['Cancer Treatments', 'Autoimmune Disease Therapy', 'Oncology Applications']
+  },
+  { 
+    id: 4, 
+    name: 'Lyophilized Protein Powder', 
+    cert: 'GMP', 
+    available: 320, 
+    expiry: '2028', 
+    temp: '−20°C',
+    usedIn: ['Enzyme Replacement Therapy', 'Biologics Production', 'Research Applications']
+  },
+  { 
+    id: 5, 
+    name: 'Injectable Suspension', 
+    cert: 'GDP', 
+    available: 140, 
+    expiry: '2026', 
+    temp: '2–8°C',
+    usedIn: ['Insulin Formulations', 'Long-Acting Injectables', 'Hormone Therapies']
+  },
 ];
 
 export function CreateOrder() {
@@ -258,6 +298,19 @@ export function CreateOrder() {
                         <p className="text-muted-foreground">
                           Expiry: <span className="font-medium">{material.expiry}</span>
                         </p>
+                      </div>
+
+                      {/* Used In Section */}
+                      <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                        <p className="text-xs font-semibold text-blue-900 mb-2">Used In</p>
+                        <div className="space-y-1">
+                          {material.usedIn.map((application, idx) => (
+                            <div key={idx} className="flex items-start gap-1.5">
+                              <span className="text-blue-600 text-xs mt-0.5">•</span>
+                              <span className="text-xs text-blue-800">{application}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                       <div className="flex gap-2">

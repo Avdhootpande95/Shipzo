@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { Package, Plane, Ship, Truck, MapPin, Thermometer, FileText, Download, X, TrendingUp, Clock, AlertTriangle } from 'lucide-react';
+import { Package, Plane, Ship, Truck, MapPin, Thermometer, FileText, Download, X, TrendingUp, Clock, AlertTriangle, CloudRain, Droplets } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { CheckCircle2 } from 'lucide-react';
 
 const shipments = [
   {
@@ -20,7 +21,12 @@ const shipments = [
     risk: 'Low',
     currentTemp: 5.2,
     route: 'Singapore → Dubai (Hub) → Frankfurt',
-    progress: 45
+    progress: 45,
+    currentLocation: 'Dubai Airport',
+    externalTemp: 42,
+    humidity: 60,
+    drugSensitivity: 'High',
+    requiredTemp: '2–8°C'
   },
   {
     id: 'SH-2024-002',
@@ -36,7 +42,12 @@ const shipments = [
     risk: 'Low',
     currentTemp: -19.8,
     route: 'Boston → Los Angeles (Hub) → Tokyo',
-    progress: 30
+    progress: 30,
+    currentLocation: 'Pacific Ocean',
+    externalTemp: 18,
+    humidity: 78,
+    drugSensitivity: 'Medium',
+    requiredTemp: '−20°C'
   },
   {
     id: 'SH-2024-004',
@@ -52,7 +63,12 @@ const shipments = [
     risk: 'High',
     currentTemp: -68.5,
     route: 'Shanghai → Hong Kong (Hub) → Dubai',
-    progress: 60
+    progress: 60,
+    currentLocation: 'Hong Kong Airport',
+    externalTemp: 32,
+    humidity: 85,
+    drugSensitivity: 'High',
+    requiredTemp: '−70°C'
   },
   {
     id: 'SH-2024-005',
@@ -68,7 +84,12 @@ const shipments = [
     risk: 'Medium',
     currentTemp: 6.8,
     route: 'Mumbai → Dubai (Hub) → London',
-    progress: 70
+    progress: 70,
+    currentLocation: 'Dubai Airport',
+    externalTemp: 38,
+    humidity: 55,
+    drugSensitivity: 'Medium',
+    requiredTemp: '2–8°C'
   },
   {
     id: 'SH-2024-007',
@@ -84,7 +105,12 @@ const shipments = [
     risk: 'Low',
     currentTemp: -20.1,
     route: 'Paris → Singapore (Hub) → Sydney',
-    progress: 25
+    progress: 25,
+    currentLocation: 'Singapore Port',
+    externalTemp: 31,
+    humidity: 82,
+    drugSensitivity: 'Low',
+    requiredTemp: '−20°C'
   },
 ];
 
@@ -120,6 +146,31 @@ export function ActiveShipmentsEnhanced() {
       case 'High': return 'bg-destructive';
       default: return 'bg-gray-500';
     }
+  };
+
+  // Calculate environmental impact on cold chain
+  const calculateEnvironmentalImpact = (shipment: typeof shipments[0]) => {
+    const externalTemp = shipment.externalTemp;
+    const sensitivity = shipment.drugSensitivity;
+    
+    // Determine risk level based on external temperature and sensitivity
+    let impactLevel: 'Low' | 'Moderate' | 'High' = 'Low';
+    let impactColor = { bg: 'bg-green-50', border: 'border-green-500', text: 'text-green-700', badge: 'bg-green-500', icon: 'text-green-600' };
+    let recommendation = '';
+
+    if (externalTemp > 35 && sensitivity === 'High') {
+      impactLevel = 'High';
+      impactColor = { bg: 'bg-red-50', border: 'border-red-500', text: 'text-red-700', badge: 'bg-red-500', icon: 'text-red-600' };
+      recommendation = 'High external temperature detected. Increased cooling load may affect shipment stability. Monitor refrigeration unit or reduce transit delay.';
+    } else if ((externalTemp > 30 && sensitivity === 'High') || (externalTemp > 35 && sensitivity === 'Medium')) {
+      impactLevel = 'Moderate';
+      impactColor = { bg: 'bg-yellow-50', border: 'border-yellow-500', text: 'text-yellow-700', badge: 'bg-yellow-500', icon: 'text-yellow-600' };
+      recommendation = 'Moderate external temperature detected. Maintain close monitoring of cooling system performance. Ensure backup power systems are operational.';
+    } else {
+      recommendation = 'External conditions are within acceptable range. Continue standard monitoring protocols.';
+    }
+
+    return { impactLevel, impactColor, recommendation };
   };
 
   return (
@@ -293,6 +344,139 @@ export function ActiveShipmentsEnhanced() {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
+
+              {/* External Environmental Impact Monitoring */}
+              {(() => {
+                const { impactLevel, impactColor, recommendation } = calculateEnvironmentalImpact(selectedShipment);
+                
+                return (
+                  <Card className={`rounded-xl border-2 ${impactColor.border}`}>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <CloudRain className="h-5 w-5 text-secondary" />
+                        External Conditions Impact
+                      </CardTitle>
+                      <CardDescription>
+                        Real-time environmental monitoring at current location
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Environmental Metrics Grid */}
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-200">
+                          <div className="flex items-center gap-2 mb-3">
+                            <MapPin className="h-4 w-4 text-secondary" />
+                            <span className="text-xs font-semibold text-gray-700">Current Location</span>
+                          </div>
+                          <p className="text-lg font-bold text-gray-900">{selectedShipment.currentLocation}</p>
+                        </div>
+
+                        <div className={`${impactColor.bg} rounded-lg p-4 border-2 ${impactColor.border}`}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Thermometer className={`h-4 w-4 ${impactColor.icon}`} />
+                            <span className="text-xs font-semibold text-gray-700">External Temperature</span>
+                          </div>
+                          <p className={`text-lg font-bold ${impactColor.text}`}>{selectedShipment.externalTemp}°C</p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-lg p-4 border border-cyan-200">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Droplets className="h-4 w-4 text-cyan-600" />
+                            <span className="text-xs font-semibold text-gray-700">Humidity Level</span>
+                          </div>
+                          <p className="text-lg font-bold text-cyan-700">{selectedShipment.humidity}%</p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
+                          <div className="flex items-center gap-2 mb-3">
+                            <AlertTriangle className="h-4 w-4 text-purple-600" />
+                            <span className="text-xs font-semibold text-gray-700">Drug Sensitivity</span>
+                          </div>
+                          <p className="text-lg font-bold text-purple-700">{selectedShipment.drugSensitivity}</p>
+                        </div>
+                      </div>
+
+                      {/* Required Temperature Display */}
+                      <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-4 border-2 border-orange-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Thermometer className="h-5 w-5 text-primary" />
+                            <span className="text-sm font-semibold text-gray-700">Required Drug Temperature</span>
+                          </div>
+                          <p className="text-xl font-bold text-primary">{selectedShipment.requiredTemp}</p>
+                        </div>
+                      </div>
+
+                      {/* Impact Indicator */}
+                      <div className={`${impactColor.bg} rounded-lg p-5 border-2 ${impactColor.border}`}>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <AlertTriangle className={`h-6 w-6 ${impactColor.icon}`} />
+                            <div>
+                              <p className="text-sm font-medium text-gray-700">Impact on Cold Chain</p>
+                              <p className={`text-2xl font-bold ${impactColor.text}`}>{impactLevel} Risk</p>
+                            </div>
+                          </div>
+                          <Badge className={`${impactColor.badge} text-white text-sm px-4 py-2 rounded-lg`}>
+                            {impactLevel}
+                          </Badge>
+                        </div>
+
+                        {/* Risk Bar Indicator */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs text-gray-600">
+                            <span>Low Impact</span>
+                            <span>High Impact</span>
+                          </div>
+                          <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className={`absolute left-0 top-0 h-full ${impactColor.badge} transition-all rounded-full`}
+                              style={{ 
+                                width: impactLevel === 'High' ? '100%' : impactLevel === 'Moderate' ? '60%' : '30%' 
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Recommendation Message */}
+                      {(impactLevel === 'Moderate' || impactLevel === 'High') && (
+                        <Card className={`rounded-lg border-2 ${impactColor.border} ${impactColor.bg}`}>
+                          <CardContent className="p-4">
+                            <div className="flex gap-3">
+                              <div className={`bg-white rounded-lg p-2 ${impactColor.border} border-2 flex-shrink-0`}>
+                                <AlertTriangle className={`h-5 w-5 ${impactColor.icon}`} />
+                              </div>
+                              <div>
+                                <p className={`text-sm font-semibold mb-1 ${impactColor.text}`}>
+                                  Recommended Action
+                                </p>
+                                <p className="text-xs text-gray-700">
+                                  {recommendation}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {impactLevel === 'Low' && (
+                        <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-green-100 rounded-full p-2">
+                              <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-green-900">Optimal Conditions</p>
+                              <p className="text-xs text-green-700">{recommendation}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
 
               {/* Shipment Timeline */}
               <Card className="rounded-xl border-2">

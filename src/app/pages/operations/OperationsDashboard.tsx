@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { Button } from '../../components/ui/button';
 import { 
   Package, 
   TrendingUp, 
@@ -11,10 +12,13 @@ import {
   Thermometer,
   Plane,
   Ship,
-  MapPin
+  MapPin,
+  Eye
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
 import worldMapBg from 'figma:asset/c7230fcf991b0848d1de94be47c71521c1e3d5e2.png';
+import { PredictiveTemperatureRisk } from '../../components/PredictiveTemperatureRisk';
+import { useState } from 'react';
 
 const shipmentModeData = [
   { name: 'Air', value: 45, color: '#3b82f6' },
@@ -45,6 +49,58 @@ const recentAlerts = [
   { id: 'SH-2024-008', type: 'Customs', severity: 'low', message: 'Customs clearance pending', time: '2 hours ago' },
 ];
 
+// Active shipments with temperature monitoring
+const activeShipments = [
+  {
+    id: 'SH-2024-001',
+    route: 'Singapore → Frankfurt',
+    product: 'Vaccine Batch A',
+    currentTemp: 4,
+    requiredRange: '2-8°C',
+    riskScore: 15,
+    status: 'Safe' as const,
+    currentLocation: 'Over Arabian Sea',
+    eta: '18 hrs',
+    progress: 65
+  },
+  {
+    id: 'SH-2024-004',
+    route: 'Shanghai → Dubai',
+    product: 'Biologic Sample B',
+    currentTemp: 7,
+    requiredRange: '2-8°C',
+    riskScore: 68,
+    status: 'Warning' as const,
+    currentLocation: 'Central Asia Hub',
+    eta: '3 days',
+    progress: 28
+  },
+  {
+    id: 'SH-2024-007',
+    route: 'Boston → Tokyo',
+    product: 'Cancer Treatment Drug',
+    currentTemp: -18,
+    requiredRange: '-20°C',
+    riskScore: 92,
+    status: 'Critical' as const,
+    currentLocation: 'Pacific Ocean',
+    eta: '5 days',
+    progress: 45
+  },
+  {
+    id: 'SH-2024-003',
+    route: 'Mumbai → London',
+    product: 'Insulin Batch',
+    currentTemp: 5,
+    requiredRange: '2-8°C',
+    riskScore: 22,
+    status: 'Safe' as const,
+    currentLocation: 'Middle East Airspace',
+    eta: '12 hrs',
+    progress: 78
+  }
+];
+
 export function OperationsDashboard() {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -52,6 +108,42 @@ export function OperationsDashboard() {
       case 'medium': return 'bg-yellow-500';
       case 'low': return 'bg-blue-500';
       default: return 'bg-gray-500';
+    }
+  };
+
+  const [showPredictiveRisk, setShowPredictiveRisk] = useState(false);
+  const [selectedShipment, setSelectedShipment] = useState<typeof activeShipments[0] | null>(null);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Safe': 
+        return { 
+          bg: 'bg-green-50', 
+          border: 'border-green-500', 
+          text: 'text-green-700', 
+          badge: 'bg-green-500'
+        };
+      case 'Warning': 
+        return { 
+          bg: 'bg-yellow-50', 
+          border: 'border-yellow-500', 
+          text: 'text-yellow-700', 
+          badge: 'bg-yellow-500'
+        };
+      case 'Critical': 
+        return { 
+          bg: 'bg-red-50', 
+          border: 'border-red-500', 
+          text: 'text-red-700', 
+          badge: 'bg-red-500'
+        };
+      default: 
+        return { 
+          bg: 'bg-gray-50', 
+          border: 'border-gray-500', 
+          text: 'text-gray-700', 
+          badge: 'bg-gray-500'
+        };
     }
   };
 
@@ -308,6 +400,86 @@ export function OperationsDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Predictive Temperature Risk */}
+      <Card className="rounded-2xl border-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Thermometer className="h-5 w-5 text-red-600" />
+            Predictive Temperature Risk Monitoring
+          </CardTitle>
+          <CardDescription>Click on any shipment to view detailed temperature risk analysis</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {activeShipments.map((shipment) => {
+              const statusColors = getStatusColor(shipment.status);
+              
+              return (
+                <Card 
+                  key={shipment.id} 
+                  className={`rounded-xl border-2 ${statusColors.border} cursor-pointer hover:shadow-lg transition-all`}
+                  onClick={() => setSelectedShipment(shipment)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="font-semibold text-sm">{shipment.id}</p>
+                        <p className="text-xs text-muted-foreground">{shipment.product}</p>
+                      </div>
+                      <Badge className={`${statusColors.badge} text-white text-xs rounded-lg`}>
+                        {shipment.status}
+                      </Badge>
+                    </div>
+
+                    <div className={`${statusColors.bg} rounded-lg p-3 mb-3 border ${statusColors.border}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-muted-foreground">Temperature</span>
+                        <Thermometer className={`h-4 w-4 ${statusColors.text}`} />
+                      </div>
+                      <p className={`text-2xl font-bold ${statusColors.text}`}>{shipment.currentTemp}°C</p>
+                      <p className="text-xs text-muted-foreground mt-1">Range: {shipment.requiredRange}</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Risk Score</span>
+                        <span className={`font-bold ${statusColors.text}`}>{shipment.riskScore}%</span>
+                      </div>
+                      <div className="bg-gray-200 rounded-full h-1.5">
+                        <div 
+                          className={`${statusColors.badge} rounded-full h-1.5`}
+                          style={{ width: `${shipment.riskScore}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    <Button 
+                      size="sm" 
+                      className="w-full mt-3 rounded-lg bg-blue-600 hover:bg-blue-700"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedShipment(shipment);
+                      }}
+                    >
+                      <Eye className="h-3 w-3 mr-1" />
+                      View Analysis
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Predictive Temperature Risk Modal */}
+      {selectedShipment && (
+        <PredictiveTemperatureRisk 
+          shipment={selectedShipment}
+          onClose={() => setSelectedShipment(null)}
+        />
+      )}
     </div>
   );
 }
